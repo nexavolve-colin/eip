@@ -1,4 +1,4 @@
-# eip
+# eip [![Go Report Card](https://goreportcard.com/badge/github.com/kaperys/eip)](https://goreportcard.com/report/github.com/kaperys/eip)
 
 `eip` is a small command line tool which allows you to retrieve public and private IP addresses of your AWS EC2 instances.
 
