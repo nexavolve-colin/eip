@@ -18,8 +18,8 @@ func TestParseFlags(t *testing.T) {
 			Name:        "2 valid flags, 1 multiple value",
 			FilterFlags: []string{"tag:SystemGroup=api,app", "tag:Name=my-ec2-instance"},
 			Expected: []*ec2.Filter{
-				&ec2.Filter{Name: aws.String("tag:SystemGroup"), Values: aws.StringSlice([]string{"api", "app"})},
-				&ec2.Filter{Name: aws.String("tag:Name"), Values: aws.StringSlice([]string{"my-ec2-instance"})},
+				{Name: aws.String("tag:SystemGroup"), Values: aws.StringSlice([]string{"api", "app"})},
+				{Name: aws.String("tag:Name"), Values: aws.StringSlice([]string{"my-ec2-instance"})},
 			},
 		},
 		{
