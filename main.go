@@ -41,25 +41,12 @@ func main() {
 		return
 	}
 
-	insIn := &ec2.DescribeInstancesInput{}
+	resolve(parseFilters(filterFlags), publicFlag, privateFlag)
+}
 
-	if filterFlags != nil {
-		var filters []*ec2.Filter
-		for _, f := range filterFlags {
-			if !strings.Contains(f, "=") {
-				fmt.Fprintf(os.Stderr, "flag %s is invalid\n", f)
-				os.Exit(exitInvalidFlag)
-			}
-
-			fs := strings.Split(f, "=")
-			filters = append(filters, &ec2.Filter{
-				Name:   aws.String(fs[0]),
-				Values: aws.StringSlice(strings.Split(fs[1], ",")),
-			})
-		}
-
-		insIn.Filters = filters
-	}
+// resolve parses the given flag data and uses the AWS SDK to describe EC2 instances.
+func resolve(ff []*ec2.Filter, pub, priv bool) {
+	insIn := &ec2.DescribeInstancesInput{Filters: ff}
 
 	s, err := session.NewSession()
 	if err != nil {
@@ -79,13 +66,38 @@ func main() {
 
 	for _, r := range result.Reservations {
 		for _, inst := range r.Instances {
-			if publicFlag && inst.PublicIpAddress != nil {
+			if pub && inst.PublicIpAddress != nil {
 				fmt.Println(*inst.PublicIpAddress)
 			}
 
-			if privateFlag && inst.PrivateIpAddress != nil {
+			if priv && inst.PrivateIpAddress != nil {
 				fmt.Println(*inst.PrivateIpAddress)
 			}
 		}
 	}
+}
+
+// parseFilters attempt to parse the given --filter flags. Filter flags are provided
+// using the following syntax: `--filter tag:SystemGroup=api,app --filter tag:Name=my-ec2-instance`.
+// `--filter` supports flags provided by the AWS SDK:
+// https://github.com/datacratic/aws-sdk-go/blob/master/service/ec2/api.go#L9532-L9754
+func parseFilters(ff filterFlags) []*ec2.Filter {
+	var filters []*ec2.Filter
+
+	if ff != nil {
+		for _, f := range ff {
+			if !strings.Contains(f, "=") {
+				fmt.Fprintf(os.Stderr, "filter %q is invalid\n", f)
+				os.Exit(exitInvalidFlag)
+			}
+
+			fs := strings.Split(f, "=")
+			filters = append(filters, &ec2.Filter{
+				Name:   aws.String(fs[0]),
+				Values: aws.StringSlice(strings.Split(fs[1], ",")),
+			})
+		}
+	}
+
+	return filters
 }
