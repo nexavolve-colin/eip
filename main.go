@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -89,9 +90,10 @@ Exit codes:
 //
 // Results are filtered using the provided slice of *ec2.Filters. For the matching results the
 // following logic is applied:
-//  If `pub` is true the associated public IP address is returned.
-//  If `pri` is true the associated private IP address is returned.
-//  If `pri` and `all` are both true, the private IP addresses associated with all instance network interfaces are returned.
+//  If `pub` is true the associated public IP address is printed.
+//  If `pri` is true the associated private IP address is printed.
+//  If `pri` and `all` are both true, the private IP addresses associated with all instance
+//   network interfaces are printed. The primary private IP address is always printed first.
 func resolve(ff []*ec2.Filter, pub, pri, all bool) {
 	insIn := &ec2.DescribeInstancesInput{Filters: ff}
 
@@ -115,8 +117,17 @@ func resolve(ff []*ec2.Filter, pub, pri, all bool) {
 	for _, r := range result.Reservations {
 		for _, inst := range r.Instances {
 			if all && pri && len(inst.NetworkInterfaces) != 0 {
+				fmt.Println(*inst.PrivateIpAddress)
+
+				// sort the addresses naturally
+				sort.Slice(inst.NetworkInterfaces, func(i, j int) bool {
+					return *inst.NetworkInterfaces[i].PrivateIpAddress < *inst.NetworkInterfaces[j].PrivateIpAddress
+				})
+
 				for _, nic := range inst.NetworkInterfaces {
-					fmt.Println(*nic.PrivateIpAddress)
+					if *nic.PrivateIpAddress != *inst.PrivateIpAddress {
+						fmt.Println(*nic.PrivateIpAddress)
+					}
 				}
 
 				continue
