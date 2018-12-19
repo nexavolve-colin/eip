@@ -36,7 +36,7 @@ $ eip --filter tag:SystemGroup=api,app --filter tag:Name=my-ec2-instance --priva
 10.11.12.13
 ```
 
-To retrieve the private IP addresses associated with all network interfaces use both the `--private` and `--all` flags. The primary private IP address is always returned first.
+To retrieve the private IP addresses associated with all network interfaces use both the `--private` and `--all` flags. The primary private IP address is always printed first.
 
 ```bash
 eip --private --all
