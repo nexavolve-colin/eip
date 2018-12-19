@@ -72,8 +72,8 @@ Exit codes:
 	flag.BoolVar(&versionFlag, "version", false, "show the eip version information")
 	flag.Var(&filterFlags, "filter", "filter used to retrieve addresses")
 	flag.BoolVar(&publicFlag, "public", false, "show instance public ip address")
-	flag.BoolVar(&privateFlag, "private", false, "show the instact private ip address")
-	flag.BoolVar(&allFlag, "all", false, "return all private IP addresses (from all network interfaces)")
+	flag.BoolVar(&privateFlag, "private", false, "show the instance private ip address")
+	flag.BoolVar(&allFlag, "all", false, "show all private IP addresses (from all network interfaces)")
 
 	flag.Parse()
 
