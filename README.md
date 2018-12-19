@@ -4,7 +4,7 @@
 
 ## Installation
 
-The easiest way to install eip is using `go get`.
+If you have a [working Go environment](https://golang.org/doc/install#testing), the easiest way to install `eip` is using `go get`.
 
 ```bash
 go get -u github.com/kaperys/eip
@@ -29,9 +29,17 @@ $ eip --private
 192.10.22.33
 ```
 
-You can filter the results using the `--filter` flag. The filter flag accepts any filter [supported by the AWS Go SDK](https://github.com/datacratic/aws-sdk-go/blob/master/service/ec2/api.go#L9532-L9754). You can provide one or more comma separated values to each filter.
+You can filter results using the `--filter` flag. The filter flag accepts any filter [supported by the AWS Go SDK](https://github.com/datacratic/aws-sdk-go/blob/master/service/ec2/api.go#L9532-L9754). Multiple filters are supported and you can provide one or more comma separated values to each filter.
 
 ```bash
-$ eip --filter tag:SystemGroup=api,app --private
+$ eip --filter tag:SystemGroup=api,app --filter tag:Name=my-ec2-instance --private
 10.11.12.13
+```
+
+To retrieve the private IP addresses associated with all network interfaces use both the `--private` and `--all` flags. The primary private IP address is always printed first.
+
+```bash
+$ eip --private --all
+192.10.22.33
+192.11.22.33
 ```
